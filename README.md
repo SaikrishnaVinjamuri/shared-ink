@@ -148,23 +148,13 @@ git clone https://github.com/yourusername/shared-ink.git
 ````
 
 
-### 2️⃣ Backend
+### 2️⃣ Run
 
 ````
-cd backend
-npm install
-npm run dev
+npm run start
 ````
 
 
-### 3️⃣ Frontend
-
-````
-cd frontend
-cd shared-ink
-npm install
-npm run dev
-````
 
 ## 🎯 Skills Demonstrated
 
