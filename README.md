@@ -4,7 +4,11 @@ A secure full-stack publishing platform demonstrating JWT authentication with re
 
 Built using **React (Vite)** + **Node.js/Express** + **MongoDB**.
 
+Live link : https://shared-ink.onrender.com/
+
 ---
+
+
 
 ## 🚀 Live Features
 
@@ -148,11 +152,19 @@ git clone https://github.com/yourusername/shared-ink.git
 ````
 
 
-### 2️⃣ Run
+### 2️⃣ .env
 
 ````
-npm run start
+create .env file and give your own Mongodb URI, Access token, refresh token and port number 
 ````
+
+### 3️⃣ Good to start
+
+Execute this command in the terminal
+
+```
+npm run start
+```
 
 
 
