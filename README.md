@@ -2,7 +2,6 @@
 
 A full-stack blog publishing platform with JWT authentication, refresh token rotation, and role-based access control.
 
-**Live:** https://shared-ink.onrender.com
 
 ---
 
