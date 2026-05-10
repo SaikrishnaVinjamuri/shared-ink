@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
 import Home from "./pages/Home";
@@ -16,79 +16,54 @@ import AdminRoute from "./components/AdminRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 
-export default function App() {
+function AppContent() {
   const { user, logout, loadingAuth } = useAuth();
+  const location = useLocation();
+  const isAuthPage = ["/login", "/register"].includes(location.pathname);
+
+  const routeTree = (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/blog/:id" element={<BlogDetails />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/write" element={<ProtectedRoute><Write /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/edit/:id" element={<ProtectedRoute><EditBlog /></ProtectedRoute>} />
+      <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+      <Route path="/admin/users/:userId" element={<AdminRoute><AdminUserBlogs /></AdminRoute>} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
 
   return (
+    <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+      <Navbar user={user} onLogout={logout} />
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+        {!isAuthPage && loadingAuth ? (
+          <div className="flex items-center justify-center py-32">
+            <div className="flex gap-1.5">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="h-2 w-2 rounded-full bg-gray-200 animate-bounce"
+                  style={{ animationDelay: `${i * 0.15}s` }}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          routeTree
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50 text-gray-900">
-        <Navbar user={user} onLogout={logout} />
-
-        <main className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
-          {loadingAuth ? (
-            <div className="rounded-2xl border bg-white p-10 text-center shadow-sm">
-              <p className="text-sm text-gray-600">Loading...</p>
-            </div>
-          ) : (
-            <div className="space-y-6 sm:space-y-8">
-              <Routes>
-                {/* Public */}
-                <Route path="/" element={<Home />} />
-                <Route path="/blog/:id" element={<BlogDetails />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-
-                {/* Protected (logged in) */}
-                <Route
-                  path="/write"
-                  element={
-                    <ProtectedRoute>
-                      <Write />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/edit/:id"
-                  element={
-                    <ProtectedRoute>
-                      <EditBlog />
-                    </ProtectedRoute>
-                  }
-                />
-
-                {/* Admin only */}
-                <Route
-                  path="/admin/users"
-                  element={
-                    <AdminRoute>
-                      <AdminUsers />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/users/:userId"
-                  element={
-                    <AdminRoute>
-                      <AdminUserBlogs />
-                    </AdminRoute>
-                  }
-                />
-
-                {/* 404 */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          )}
-        </main>
-      </div>
+      <AppContent />
     </BrowserRouter>
   );
 }

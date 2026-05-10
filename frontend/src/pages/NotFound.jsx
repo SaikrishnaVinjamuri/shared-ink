@@ -2,29 +2,18 @@ import { Link } from "react-router-dom";
 
 export default function NotFound() {
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="rounded-2xl border bg-white p-10 text-center shadow-sm">
-        <p className="text-sm text-gray-600">404</p>
-        <h1 className="mt-2 text-2xl font-bold">Page not found</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          The page you’re looking for doesn’t exist (or was moved).
-        </p>
-
-        <div className="mt-6 flex justify-center gap-3">
-          <Link
-            to="/"
-            className="rounded-xl bg-black px-4 py-2 text-sm text-white hover:opacity-90"
-          >
-            Go Home
-          </Link>
-          <Link
-            to="/profile"
-            className="rounded-xl border px-4 py-2 text-sm hover:bg-gray-50"
-          >
-            Profile
-          </Link>
-        </div>
-      </div>
+    <div className="flex flex-col items-center justify-center py-20 text-center">
+      <p className="text-[7rem] font-black text-gray-100 leading-none select-none dark:text-gray-800">404</p>
+      <h1 className="mt-4 text-2xl font-bold text-gray-900 dark:text-white">Page not found</h1>
+      <p className="mt-2 text-sm text-gray-500 max-w-xs dark:text-gray-400">
+        The page you're looking for doesn't exist or has been moved.
+      </p>
+      <Link
+        to="/"
+        className="mt-8 inline-flex items-center gap-2 rounded-full bg-gray-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-gray-700 transition-colors dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
+      >
+        Go home
+      </Link>
     </div>
   );
 }

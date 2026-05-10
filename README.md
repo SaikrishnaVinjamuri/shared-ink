@@ -1,181 +1,123 @@
-# 📘 Shared Ink
+# Shared Ink
 
-A secure full-stack publishing platform demonstrating JWT authentication with refresh token rotation, role-based access control (RBAC), and automatic session renewal.
+A full-stack blog publishing platform with JWT authentication, refresh token rotation, and role-based access control.
 
-Built using **React (Vite)** + **Node.js/Express** + **MongoDB**.
-
-Live link : https://shared-ink.onrender.com/
+**Live:** https://shared-ink.onrender.com
 
 ---
 
+## Tech Stack
 
-
-## 🚀 Live Features
-
-### 👤 Authentication
-
-- User registration  
-- Login with JWT authentication  
-- Short-lived Access Token (10 minutes)  
-- Refresh Token stored in **httpOnly cookie** (7 days)  
-- Automatic token refresh using Axios interceptor  
-- Secure logout with cookie invalidation  
+**Frontend:** React 19, Vite, React Router, TailwindCSS, Axios  
+**Backend:** Node.js, Express 5, MongoDB, Mongoose, JWT, bcrypt  
 
 ---
 
-### 📝 Blog System
+## Features
 
-- Create blog posts  
-- Edit your own posts  
-- Delete your own posts  
-- View full blog details  
-- Paginated blog feed (Home page)  
-- Paginated profile posts  
-
----
-
-### 🛡 Role-Based Access Control
-
-- Admin-only protected routes  
-- Admin can:
-  - View all users  
-  - Delete users  
-  - Delete any blog  
-- Protected routes using React route guards  
+- JWT auth — access token (20min, in-memory) + refresh token (7 days, httpOnly cookie)
+- Automatic token refresh via Axios interceptor — failed requests retry transparently
+- Token rotation — old refresh token invalidated on every refresh
+- Role-based access control — admin can delete any post or user
+- Dark mode with system preference detection and localStorage persistence
+- Paginated blog feed and profile posts
+- Reading time estimates, author avatars
+- Skeleton loading states, toast notifications
+- Fully responsive — mobile and desktop
 
 ---
 
-### 🎯 UI/UX
+## Local Setup
 
-- Fully responsive design (mobile + desktop)  
-- Clean single-column layout  
-- Toast notifications  
-- Custom 404 page  
-- Loading states  
-- Navigation history handling  
-- Admin & user route protection  
+### 1. Clone
 
----
+```bash
+git clone https://github.com/saikrishnavinjamuri/shared-ink.git
+cd shared-ink
+```
 
-## 🧠 Architecture Overview
+### 2. Environment variables
 
-### Frontend
+Create `backend/.env`:
 
-- React (Vite)
-- React Router
-- Context API (Auth + Toast)
-- Axios with interceptors
-- TailwindCSS
-- Role-based route protection
-
-### Backend
-
-- Node.js
-- Express
-- MongoDB (Mongoose)
-- JWT authentication
-- Refresh token rotation
-- Cookie-based auth (httpOnly)
-- CORS with credentials
-- Protected API routes
-- Role-based middleware
-
----
-
-## 🔐 Authentication Flow
-
-1. User logs in  
-2. Backend issues:
-   - Access Token (10 minutes)
-   - Refresh Token (7 days, httpOnly cookie)
-3. Access token stored in memory  
-4. Axios interceptor:
-   - Detects expired token  
-   - Calls `/auth/refresh-token`  
-   - Retries failed request automatically  
-5. Logout clears refresh token and session  
-
----
-
-## 🗄 Database Models
-
-### User
-- username
-- email
-- password (hashed)
-- role (`user` | `admin`)
-
-### Blog
-- title
-- content
-- authorId (ref: User)
-- createdAt / updatedAt
-
-### RefreshToken
-- userId (unique)
-- token
-- createdAt (expires in 7 days)
-
----
-
-## 🛡 Security Implementations
-
-- Password hashing (bcrypt)
-- httpOnly refresh cookies
-- Token rotation
-- Role-based authorization middleware
-- Protected React routes
-- Automatic access token refresh
-- CORS configured with credentials
-- Duplicate token protection (Mongo index fix)
-
----
-
-## ⚙️ Environment Variables (Backend)
-
-````
+```env
 PORT=3000
-MONGO_URI=your_mongodb_connection_string
-ACCESSTOKEN_SECRET=your_secret
-REFRESHTOKEN_SECRET=your_secret
-````
+MONGODB_URI=your_mongodb_connection_string
+ACCESSTOKEN_SECRET=your_access_token_secret
+REFRESHTOKEN_SECRET=your_refresh_token_secret
+```
 
+### 3. Run in development
+
+Backend (port 3000):
+```bash
+npm run dev
+```
+
+Frontend (port 5173), in a second terminal:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### 4. Run in production
+
+```bash
+npm run build
+npm start
+```
+
+`npm run build` installs dependencies and builds the frontend. The backend then serves the built frontend from `frontend/dist`.
 
 ---
 
-## 💻 Local Setup
+## Authentication Flow
 
-### 1️⃣ Clone repository
+1. Login → backend issues access token (20min) + refresh token (7d httpOnly cookie)
+2. Access token stored in React context (memory only, never localStorage)
+3. Every request attaches `Authorization: Bearer <token>` via Axios interceptor
+4. On 401/403 → interceptor calls `/api/auth/refresh-token`, gets new access token, retries original request
+5. Logout → clears cookie and deletes refresh token from database
 
-````
-git clone https://github.com/yourusername/shared-ink.git
-````
+---
 
+## API Routes
 
-### 2️⃣ .env
+| Method | Path | Auth |
+|--------|------|------|
+| POST | `/api/auth/register` | — |
+| POST | `/api/auth/login` | — |
+| POST | `/api/auth/refresh-token` | cookie |
+| POST | `/api/auth/logout` | cookie |
+| GET | `/api/blogs` | — |
+| GET | `/api/blogs/:id` | — |
+| GET | `/api/blogs/users/:id/blog` | — |
+| POST | `/api/blogs/new-blog` | token |
+| POST | `/api/blogs/update/:id` | token (author only) |
+| DELETE | `/api/blogs/delete/:id` | token (author or admin) |
+| GET | `/api/users/me` | token |
+| GET | `/api/users` | token + admin |
+| DELETE | `/api/users/:id` | token + admin |
 
-````
-create .env file and give your own Mongodb URI, Access token, refresh token and port number 
-````
+---
 
-### 3️⃣ Good to start
-
-Execute this command in the terminal
+## Project Structure
 
 ```
-npm run start
+shared-ink/
+├── backend/
+│   ├── config/db.js
+│   ├── controllers/
+│   ├── middleware/        # verifyToken, authorizeRole
+│   ├── models/            # User, Blog, RefreshToken
+│   ├── routes/
+│   └── server.js
+├── frontend/
+│   └── src/
+│       ├── api/axios.js   # interceptors
+│       ├── context/       # AuthContext, ToastContext, ThemeContext
+│       ├── components/    # Navbar, Toast, ProtectedRoute, AdminRoute
+│       └── pages/
+└── package.json           # root — runs backend, builds frontend
 ```
-
-
-
-## 🎯 Skills Demonstrated
-
-- Full-stack application architecture
-- JWT authentication with refresh token rotation
-- Role-based access control (RBAC)
-- Secure REST API development
-- Axios interceptors for token lifecycle management
-- React Context state management
-- Responsive UI with TailwindCSS
-- Production-ready cookie handling
-- Deployment planning and environment configuration
