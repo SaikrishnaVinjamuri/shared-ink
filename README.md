@@ -47,19 +47,16 @@ ACCESSTOKEN_SECRET=your_access_token_secret
 REFRESHTOKEN_SECRET=your_refresh_token_secret
 ```
 
-### 3. Run in development
+### 3. Install and run
 
-Backend (port 3000):
 ```bash
-npm run dev
+npm run build   # installs deps + builds frontend
+npm run dev     # starts backend with nodemon at localhost:3000
 ```
 
-Frontend (port 5173), in a second terminal:
-```bash
-cd frontend
-npm install
-npm run dev
-```
+Frontend is served from the backend at `localhost:3000`.
+
+> **Frontend HMR (optional):** If actively editing frontend code, run `cd frontend && npm run dev` in a second terminal to get Vite's hot reload at `localhost:5173`.
 
 ### 4. Run in production
 
